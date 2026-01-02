@@ -1,0 +1,138 @@
+{% extends "staff/teacher/base_site.html" %}
+
+{% block title %} Update Questions {% endblock title %}
+
+{% block main %}
+
+    <main id="main" class="main">
+        
+        <div class="pagetitle">
+            <h1>Update Questions</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url "teacher-index-view" %}">Home</a></li>
+                    <li class="breadcrumb-item active">Update Questions</li>
+                </ol>
+            </nav>
+        </div>
+
+        <section class="section dashboard">
+            <div class="row justify-content-center">
+                <div class="col-lg-9">
+                    <div class="card">
+                        <div class="card-body">
+
+                            <h5 class="card-title mb-3 pb-1 d-flex justify-content-between">
+                                {{question_set.subject}}
+                                <span>{{question_set.subject.semester}}</span>
+                            </h5>
+                            
+                            <div class="row g-3 justify-content-between align-items-center mb-4">
+
+                                <div class="col-3">
+                                    <select id="unit-dropdown" class="form-select" name="number">
+                                        {% for unit in units %}
+                                            <option {% if current_unit is unit %} selected {% endif %} value="{{unit}}">Unit : {{unit}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-5 text-center">
+                                    <p class="card-text"><span class="fw-semibold">CO.({{question_set.co_no}})</span>  {{question_set.co_title}}</p>
+                                </div>
+                                <div class="col-4 d-flex justify-content-between">
+                                    <a href="{% url "update-question-set-view" question_set.id %}" class="btn btn-secondary">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+
+                                    <a href="{% url "list-question-view" question_set.id %}" class="btn btn-warning">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    
+                                    <a href="{% url "delete-question-set-view" question_set.subject.id question_set.unit_no %}" class="btn btn-danger">
+                                        <i class="bi bi-trash"></i>
+                                        Delete
+                                    </a>
+                                </div>
+                            </div>
+
+
+                            {% include "components/alert.html" %}
+
+                            <form id="updateQuestionForm" method="post">
+                                {% csrf_token %}
+                                <div>
+                                    <input type="hidden" id="subjectId" value="{{question_set.subject.id}}">
+                                    <input type="hidden" id="currentUnit" value="{{current_unit}}">
+                                    <input type="hidden" name="id" id="id" value="{{question_set.id}}">
+                                </div>
+                                <div id="questionContainer">
+                                    {% for question in questions %}
+                                        <div class="row align-items-end mb-3 questionRow">
+                                            
+                                            <div class="col-6">
+                                                <label for="questionTitle" class="form-label">({{ forloop.counter }}) Question Title</label>
+                                                <input type="text" class="form-control" name="question_title[]" value="{{question.title}}" required>
+                                            </div>
+                                
+                                            <div class="col-2">
+                                                <label for="marks" class="form-label">Marks</label>
+                                                <input type="text" class="form-control" name="mark[]" value="{{question.mark}}" required>
+                                            </div>
+                                
+                                            <div class="col-3">
+                                                <label for="level" class="form-label">Level</label>
+                                                <input type="text" class="form-control" name="level[]" value="{% if question.level == '' %}Undefined{% else %}{{question.level}}{% endif %}" readonly required style="overflow-x: scroll; white-space: nowrap; text-overflow: ellipsis;">
+                                            </div>
+
+                                            <div class="col-1">
+                                                <button type="button" class="btn btn-transparent btn-sm text-end" data-bs-toggle="modal" data-bs-target="#verticalycentered({{ forloop.counter }})">
+                                                    <i class="bi bi-trash3" style="cursor: pointer; color: red;"></i>
+                                                </button>
+                                                
+                                                <div class="modal fade" id="verticalycentered({{ forloop.counter }})" tabindex="-1">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                <h5 class="modal-title">Confrim Delete</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    Confirm Delete Question ({{ forloop.counter }})  ?
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                    <button type="submit" value='({{ forloop.counter }})' class="btn btn-danger removeRow">Delete</button>
+                                                                </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <div id="addQuestionRow" class="col d-flex gap-1 align-items-center" style="max-width: max-content;">
+                                    <span class="fw-medium">ADD QUESTION</span>
+                                    <i class="bi bi-plus-square-fill fs-5"></i>
+                                </div>
+
+
+
+                                <div class=" col-12 text-center">
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    <a href="{% url "list-question-set-view" %}" class="btn btn-secondary">Close</a>
+                                </div>
+                            </form>
+            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+{% endblock main %}
